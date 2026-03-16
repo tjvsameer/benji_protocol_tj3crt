@@ -1,0 +1,12 @@
+2024-05-27T12:30:45 sshd[1024]: Failed password for invalid user admin from 192.168.1.5 port 50214 ssh2
+2024-05-27T12:30:47 sshd[1024]: Failed password for invalid user test from 192.168.1.5 port 50214 ssh2
+2024-05-27T12:30:49 sshd[1024]: Failed password for invalid user guest from 192.168.1.5 port 50214 ssh2
+2024-05-27T12:30:51 sshd[1024]: Invalid user oracle from 192.168.1.5 port 50214
+2024-05-27T12:30:54 sshd[1024]: Failed password for root from 192.168.1.5 port 50214 ssh2
+2024-05-27T12:30:58 sshd[1024]: Failed password for root from 192.168.1.5 port 50214 ssh2
+2024-05-27T12:31:01 sshd[1024]: Invalid user postgres from 192.168.1.5 port 50214
+2024-05-27T12:31:05 sshd[1024]: Failed password for invalid user mysql from 192.168.1.5 port 50214 ssh2
+2024-05-27T12:31:05 sshd[1024]: Failed password for invalid user mysql from 192.168.1.5 port 50214 ssh2
+2024-05-27T12:31:08 sshd[1024]: Failed password for invalid user backup from 192.168.1.5 port 50214 ssh2
+2024-05-27T12:31:12 sshd[1024]: Failed password for root from 192.168.1.5 port 50214 ssh2
+2024-05-27T12:30:45 sshd: Failed password for invalid user admin from
