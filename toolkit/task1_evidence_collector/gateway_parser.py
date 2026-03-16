@@ -82,9 +82,9 @@ def parse_log(input_file) -> None:
                         seen.add(record_key)
                         records.append(
                             {
-                                "timestamp": record_key[0],
-                                "ip_address": record_key[1],
-                                "username": record_key[2],
+                                "Timestamp": record_key[0],
+                                "IP_Address": record_key[1],
+                                "User_Account": record_key[2],
                             }
                         )
                     break

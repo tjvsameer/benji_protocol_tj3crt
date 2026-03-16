@@ -25,9 +25,9 @@ def test_failed_password_extracted(tmp_path):
 
     assert len(records) == 1
     record = records[0]
-    assert record["timestamp"] == "2024-05-27T12:30:45"
-    assert record["username"] == "admin"
-    assert record["ip_address"] == "192.168.1.5"
+    assert record["Timestamp"] == "2024-05-27T12:30:45"
+    assert record["User_Account"] == "admin"
+    assert record["IP_Address"] == "192.168.1.5"
 
 
 def test_corrupted_password_extracted(tmp_path):
