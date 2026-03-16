@@ -14,6 +14,7 @@ FAILED_PASSWORD = re.compile(
     r"(?P<ip>\d{1,3}(?:\.\d{1,3}){3})"
 )
 
+
 INVALID_USER = re.compile(
     r"(?P<timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})"
     r".*?"
@@ -21,6 +22,19 @@ INVALID_USER = re.compile(
     r"[Ii]nvalid user "
     r"(?P<username>\S+)"
     r" from "
+    r"(?P<ip>\d{1,3}(?:\.\d{1,3}){3})"
+)
+FAILED_PASSWORD_AUTH = re.compile(
+    r"(?P<timestamp>[A-Z][a-z]{2}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2}).*?"
+    r"Failed password for (?:invalid user )?"
+    r"(?P<username>\S+) from "
+    r"(?P<ip>\d{1,3}(?:\.\d{1,3}){3})"
+)
+
+INVALID_USER_AUTH = re.compile(
+    r"(?P<timestamp>[A-Z][a-z]{2}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2}).*?"
+    r"[Ii]nvalid user "
+    r"(?P<username>\S+) from "
     r"(?P<ip>\d{1,3}(?:\.\d{1,3}){3})"
 )
 
@@ -45,11 +59,17 @@ def parse_log(input_file) -> None:
         sys.exit(1)
 
     records = []
-    seen = set()
 
+    seen = set()
+    patterns = (
+        FAILED_PASSWORD,
+        INVALID_USER,
+        FAILED_PASSWORD_AUTH,
+        INVALID_USER_AUTH,
+    )
     with path.open(encoding="utf-8", errors="ignore") as f:
         for line in f:
-            for pattern in (FAILED_PASSWORD, INVALID_USER):
+            for pattern in patterns:
                 m = pattern.search(line)
 
                 if m:
