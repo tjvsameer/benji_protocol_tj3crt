@@ -9,8 +9,8 @@ venv/
 # Logs
 *.log
 
-# Generated files
-suspects.csv
+
 
 # OS files
 .DS_Store
+cartographer_results.json
