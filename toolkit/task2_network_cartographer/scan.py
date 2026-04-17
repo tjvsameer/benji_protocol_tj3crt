@@ -1,151 +1,96 @@
-"""
-================================================================================
-COM5413 — The Benji Protocol
-Task 2: The Network Cartographer
-File:   scan.py
-================================================================================
-
-MISSION BRIEF
--------------
-Ethan cannot go in blind. Benji maps every door, every service, every version
-number. The scan is not the attack — it is the intelligence that makes the
-attack possible. A missed service or a wrong version assumption costs the
-mission.
-
-Your job is to build a threaded TCP port scanner that identifies open ports and
-grabs the service banner from each one. The banner is the service telling you
-exactly what it is and what version it is running. Listen carefully.
-
-WHAT THIS SCRIPT MUST DO
--------------------------
-1. Accept a target IP and port range/list as command-line arguments.
-2. Attempt a TCP connection to each port using Python's socket library.
-3. If the port is open, attempt to receive the service banner (the greeting
-   text the service sends on connection).
-4. Use threading (ThreadPoolExecutor) to scan multiple ports concurrently.
-5. Implement a connection timeout (default 0.5s) — hanging the scanner is not
-   an option in the field.
-6. Output results as JSON: printed to stdout AND saved to recon_results.json.
-
-CONSTRAINTS
------------
-- Python 3.10+ only.
-- Use socket — do NOT wrap nmap or any external scanner.
-- NO use of input() — all input via argparse.
-- Timeout must be configurable via --timeout argument.
-
-OUTPUT CONTRACT (auto-grader depends on this)
----------------------------------------------
-JSON structure:
-{
-    "target": "192.168.x.x",
-    "scan_time": "YYYY-MM-DD HH:MM:SS",
-    "open_ports": [
-        {"port": 21, "banner": "220 (vsFTPd 2.3.4)"},
-        {"port": 22, "banner": "SSH-2.0-OpenSSH_4.7p1"},
-        {"port": 80, "banner": ""}
-    ]
-}
-"banner" must always be present — use empty string if no banner received.
-
-EXAMPLE USAGE
--------------
-    python scan.py 192.168.56.101 --ports 1-1024
-    python scan.py 192.168.56.101 --ports 21,22,80,443
-    python scan.py 192.168.56.101 --ports 1-65535 --timeout 1.0 --threads 100
-
-BUILD LOG
----------
-Use docs/build.md to record your development notes, decisions, and reflections
-as you build this tool. Pay particular attention to documenting what you observe
-in the banner output when scanning Metasploitable — this feeds directly into
-the Vulnerability Hunt.
-================================================================================
-"""
-
-# Your imports go here
 import argparse
 import json
 import socket
 import sys
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime
+import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from ssl import PROTOCOL_TLS_SERVER
 
 
-def parse_arguments():
-    """
-    Define and parse command-line arguments.
+def parse_arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="TCP connect scanner with banner grabbing."
+    )
 
-    Returns the parsed namespace object.
-    Required: target (positional IP address)
-    Optional: --ports, --timeout, --threads, --output
-    """
-    # TODO: Implement argparse
-    # --ports should accept both ranges (1-1024) and lists (21,22,80)
+    parser.add_argument("target", help="Target IP Address")
+    parser.add_argument("--ports", default="1-1024", help="Port range or list. Default")
+    parser.add_argument(
+        "--timeout",
+        type=float,
+        default=0.5,
+        help="Connection time out per port in seconds. Default: 0.5",
+    )
+    parser.add_argument(
+        "--output", default="cartographer_results.json", help="Output JSON"
+    )
+    parser.add_argument(
+        "--threads", type=int, default=50, help="Thread pool size. Default"
+    )
+    return parser.parse_args()
+
+
+def parse_port_input(port_str: str) -> list[int]:
+    ports = []
+    for part in port_str.split(","):
+        part.strip()
+        if "-" in part:
+            pieces: list[str] = part.split("-", 1)
+            start, end = [int(x.strip()) for x in pieces]
+            ports.extend(range(start, end + 1))
+        else:
+            ports.append(int(part))
+    return sorted(set(ports))
+
+
+def check_port(target: str, port: int, timeout: float = 0.5) -> bool:
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        sock.settimeout(timeout)
+        result: int = sock.connect_ex((target, port))
+        return result == 0
+    except socket.timeout:
+        return False
+    finally:
+        sock.close()
     pass
 
 
-def parse_port_input(port_string: str) -> list[int]:
-    """
-    Parse a port string into a list of integer port numbers.
+def grab_banner(target: str, port: int, timeout: float = 0.5) -> str:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
 
-    Accepts:
-        "1-1024"    → [1, 2, 3, ..., 1024]
-        "21,22,80"  → [21, 22, 80]
+        sock.settimeout(timeout)
+        try:
 
-    Args:
-        port_string: Raw string from argparse.
-
-    Returns:
-        Sorted list of port integers.
-
-    Raises:
-        ValueError: If the format is unrecognised or ports are out of range.
-    """
-    # TODO: Implement port range/list parsing
-    pass
-
-
-def grab_banner(sock: socket.socket, timeout: float = 0.5) -> str:
-    """
-    Attempt to receive a banner string from an open socket.
-
-    Args:
-        sock:    An already-connected socket object.
-        timeout: Seconds to wait for banner data.
-
-    Returns:
-        Decoded banner string, or empty string if no banner received.
-    """
-    # TODO: Implement banner grabbing
-    # Handle: timeout, decode errors, empty response
-    pass
-
-
-def check_port(target: str, port: int, timeout: float) -> dict | None:
-    """
-    Attempt a TCP connection to target:port.
-
-    Args:
-        target:  IP address string.
-        port:    Port number integer.
-        timeout: Connection timeout in seconds.
-
-    Returns:
-        Dict {"port": int, "banner": str} if open, None if closed/filtered.
-    """
-    # TODO: Implement TCP connect attempt
-    # On success: call grab_banner(), return result dict
-    # On failure: return None (do not raise)
-    pass
+            sock.connect_ex((target, port))
+            time.sleep(0.5)
+            return sock.recv(1024).decode("utf-8", errors="ignore")
+        except:
+            (socket.timeout, ConnectionRefusedError, OSError)
+            return ""
 
 
 def main():
-    args = parse_arguments()
-    # TODO: Wire parse_arguments → parse_port_input → ThreadPoolExecutor
-    #       → collect results → write JSON output
-    pass
+    args: Namespace = parse_arguments()
+    ports: list[int] = parse_port_input(args.ports)
+    open_ports: list[any] = []
+    with ThreadPoolExecutor(max_workers=args.threads) as executor:
+        futures: dict[Future[bool], int] = {
+            executor.submit(check_port, args.target, p, args.timeout): p for p in ports
+        }
+        for future, port in futures.items():
+            if future.result():
+                banner: str = grab_banner(args.target, port, args.timeout)
+                open_ports.append({"port": port, "banner": banner})
+    open_ports.sort(key=lambda x: x["port"])
+
+    output: dict[str, Any] = {
+        "target": args.target,
+        "open_ports": open_ports,
+    }
+    print(json.dumps(output, indent=2))
+    Path(args.output).write_text(json.dumps(output, indent=2))
+    print(f"[*] {len(open_ports)}  port(s) found.", file=sys.stderr)
 
 
 if __name__ == "__main__":
