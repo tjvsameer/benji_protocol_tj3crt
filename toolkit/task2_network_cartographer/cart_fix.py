@@ -40,7 +40,7 @@ def test_cpfr(target: str, port: int) -> bool:
         time.sleep(0.1)
         response = sock.recv(1024).decode("utf-8", errors="ignore").strip()
         print(f"    [*] SITE CPFR response: {response}")
-        return response.startswith("350")
+        return response.startswith("250")
     except Exception as e:
         print(f"    [*] Connection failed: {e}")
         return False
