@@ -1238,30 +1238,45 @@ worked on the mock test.
 
 ### Pre-Hunt Checklist
 
-- [ ] All four toolkit tools pass their field tests locally
-- [ ] `requirements.txt` is up to date (`pip freeze > requirements.txt`)
-- [ ] `AI_LOG.md` is current
-- [ ] `vulnerability_hunt/exploit.py` — argument parsing in place
-- [ ] `vulnerability_hunt/fix.py` — argument parsing in place
-- [ ] `vulnerability_hunt/REPORT.md` — headings populated, ready to fill
-- [ ] Git remote confirmed, can push
-- [ ] Tags w1, w2, w3, w4 in place
+- [ok ] All four toolkit tools pass their field tests locally
+- [ok ] `requirements.txt` is up to date (`pip freeze > requirements.txt`)
+- [ok ] `AI_LOG.md` is current
+- [okok ] `vulnerability_hunt/exploit.py` — argument parsing in place
+- [ok ] `vulnerability_hunt/fix.py` — argument parsing in place
+- [oko ] `vulnerability_hunt/REPORT.md` — headings populated, ready to fill
+- ok[ ] Git remote confirmed, can push
+- [ok ] Tags w1, w2, w3, w4 in place
 
 ### Hunt Log
 
-**[TIME] — Diagnosis phase:**
+**[14:00] — Diagnosis phase:**
 
-**[TIME] — Vulnerability identified:**
+**[14:30] — Vulnerability identified:**
 
-**[TIME] — Exploit development:**
+**[1520] — Exploit development:**
 
-**[TIME] — Flag retrieved:**
-```
-FLAG:
-```
+**[15:25] — Flag retrieved:**
+output:
+┌──(.venv)─(tariq㉿kali)-[~/benji-protocol-tjvsameer]
+└─$ python3 vulnerability_hunt/exploit.py \
+  --target 172.16.19.200 \
+  --user root \
+  --password Th3Synd1c4te! \
+  --keyfile /var/log/evidence.log
+[*] Connecting to 172.16.19.200 as root...
+[*] Reading evidence log: /var/log/evidence.log
+[*] Extracting flag...
+FLAG: COM5413-20260424-0b39-ETHAN-WAS-HERE-b3fb3916f123
 
-**[TIME] — Remediation:**
+    FLAG
+FLAG: COM5413-20260424-0b39-ETHAN-WAS-HERE-b3fb3916f123
 
-**[TIME] — Final commit and push:**
 
+**[17:00] — Remediation:**
 
+**[17:30] — Final commit and push:**
+
+Bibliography.
+
+https://chatgpt.com
+https://github.com
